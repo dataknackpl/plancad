@@ -1,8 +1,10 @@
-from scheduler import Activity, RoomSlot, find_schedule
+import pytest # type: ignore
+
+from scheduler import find_schedule, SchedulerError
 
 
 def test_find_schedule_no_constraints():
-    """ Given a set of Activities, RoomSlots 
+    """ Given a set of Activities, RoomSlots
         and no constrains, calling find_schedule
         should be able to find mapping for all Activities
     """
@@ -21,3 +23,15 @@ def test_find_schedule_no_constraints():
     assert len(set(solution_slots)) == len(
         solution_slots
     ), "slots in solution must be unique"
+
+
+def test_find_schedule_not_enought_slots():
+    """ Given a set of Activities, and to few RoomSlots
+        calling find_schedule
+        should raise exception
+    """
+    activities = ["A1", "A2"]
+    slots = [("R1", "M8")]
+
+    with pytest.raises(SchedulerError):
+        find_schedule(activities, slots)
