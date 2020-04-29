@@ -10,4 +10,5 @@ def find_schedule(
     """ Finds a schedule that meets all constraints
         Returns map between Activity and RoomSlots, or empty dict if not possible
     """
-    pass
+    schedule = {a:s for a,s in zip(activities, slots)}
+    return schedule
