@@ -25,7 +25,7 @@ def test_find_schedule_no_constraints():
     ), "slots in solution must be unique"
 
 
-def test_find_schedule_not_enought_slots():
+def test_find_schedule_not_enough_slots():
     """ Given a set of Activities, and to few RoomSlots
         calling find_schedule
         should raise exception
