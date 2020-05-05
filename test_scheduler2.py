@@ -47,12 +47,12 @@ def test_check_constraint():
 
 def check_basic_properties_of_schedule(activities, slots, schedule):
     " Verify the invariants of the correct schedule "
-    assert len(schedule) == 3
+    assert len(schedule) == len(activities)
 
     assert set(schedule.keys()) == set(activities), "all activities should be mapped"
 
     solution_slots = schedule.values()
-    assert set(solution_slots) < set(slots), "all values should be from original slots"
+    assert set(solution_slots) <= set(slots), "all values should be from original slots"
 
     assert len(set(solution_slots)) == len(
         solution_slots
@@ -98,6 +98,8 @@ def test_find_schedule_single_constraint():
         return RoomSlot(value=f"{room}{slot}", attributes={"room": room})
 
     activities = [Activity(n) for n in ["A1", "A2", "A3"]]
+    activities.append(Activity("A4", ["room == R2"]))
+
     slots = [
         make_slot(t) for t in [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R2", "M9")]
     ]
@@ -107,4 +109,6 @@ def test_find_schedule_single_constraint():
 
     # check if constraint is met on the result schedule
     print(f"{schedule=}")
-    # assert a2_constraint(schedule), "schedule should match given constraints"
+    for a, s in schedule.items():
+        if a.constraints:
+            assert a.is_slot_valid(s), "slot must be valid in result schedule"

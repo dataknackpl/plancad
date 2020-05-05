@@ -9,6 +9,9 @@ class RoomSlot:
         self.value = value
         self.attributes = attributes if attributes else {}
 
+    def __repr__(self):
+        return f"RoomSlot(value='{self.value}', attributes={self.attributes}"
+
 
 class Activity:
     def __init__(self, name: str, constraints: List[Constraint] = None):
@@ -36,6 +39,9 @@ class Activity:
 
         return True
 
+    def __repr__(self):
+        return self.name
+
 
 Schedule = Dict[Activity, RoomSlot]
 
@@ -46,9 +52,6 @@ class SchedulerError(Exception):
 
 def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Schedule:
     """ Scheduler which uses Deep First Search aproach """
-
-    print(f"{slots=}")
-    print(type(slots[0]))
 
     def get_next_unasigned_variable(schedule):
         for activity in activities:
