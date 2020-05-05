@@ -61,7 +61,6 @@ def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Sched
 
     def get_possible_values(schedule, next_variable):
         used_values = set(schedule.values())
-        print(f"{used_values=}")
         return [v for v in slots if v not in used_values]
 
     queue: deque = deque()
@@ -73,9 +72,12 @@ def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Sched
         if frozenset(schedule.items()) in visited:
             continue
 
-        # if not all(c(schedule) for c in constraints):
-        #    visited.add(frozenset(schedule.items()))
-        #    continue
+        validation_checks = [
+            a.is_slot_valid(s) for a, s in schedule.items() if a.constraints
+        ]
+        if not all(validation_checks):
+            visited.add(frozenset(schedule.items()))
+            continue
 
         next_variable = get_next_unasigned_variable(schedule)
         if not next_variable:

@@ -59,13 +59,21 @@ def check_basic_properties_of_schedule(activities, slots, schedule):
     ), "slots in solution must be unique"
 
 
+def make_slot(t) -> RoomSlot:
+    room = t[0]
+    slot = t[1]
+    return RoomSlot(value=f"{room}{slot}", attributes={"room": room})
+
+
 def test_find_schedule_no_constraints():
     """ Given a set of Activities, RoomSlots
         and no constrains, calling find_schedule
         should be able to find mapping for all Activities
     """
-    activities = ["A1", "A2", "A3"]
-    slots = [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R2", "M9")]
+    activities = [Activity(n) for n in ["A1", "A2", "A3"]]
+    slots = [
+        make_slot(t) for t in [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R1", "M9")]
+    ]
 
     schedule = find_schedule(activities, slots)
     print(f"{schedule=}")
@@ -92,16 +100,11 @@ def test_find_schedule_single_constraint():
         that schedules that activity into that room
     """
 
-    def make_slot(t) -> RoomSlot:
-        room = t[0]
-        slot = t[1]
-        return RoomSlot(value=f"{room}{slot}", attributes={"room": room})
-
     activities = [Activity(n) for n in ["A1", "A2", "A3"]]
     activities.append(Activity("A4", ["room == R2"]))
 
     slots = [
-        make_slot(t) for t in [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R2", "M9")]
+        make_slot(t) for t in [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R1", "M12")]
     ]
 
     schedule = find_schedule(activities, slots)
