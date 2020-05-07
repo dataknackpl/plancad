@@ -1,5 +1,5 @@
 import pytest  # type: ignore
-from scheduler2 import (
+from scheduler import (
     total_number_of_combinations,
     find_schedule,
     SchedulerError,
