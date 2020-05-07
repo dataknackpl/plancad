@@ -1,6 +1,16 @@
 import pytest  # type: ignore
+from scheduler2 import (
+    total_number_of_combinations,
+    find_schedule,
+    SchedulerError,
+    Activity,
+    RoomSlot,
+)
 
-from scheduler2 import find_schedule, SchedulerError, Activity, RoomSlot
+
+def test_total_number_of_combinations():
+    assert total_number_of_combinations(2, 2) == 2
+    assert total_number_of_combinations(3, 2) == 6
 
 
 def test_create_room_slot_no_attrs():

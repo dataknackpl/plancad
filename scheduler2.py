@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple
 from collections import deque
+from functools import reduce
 
 Constraint = str
 
@@ -48,6 +49,16 @@ Schedule = Dict[Activity, RoomSlot]
 
 class SchedulerError(Exception):
     pass
+
+
+def total_number_of_combinations(n: int, k: int) -> int:
+    """ Calculate how many nodes at total needs to be visited """
+    # num of combinations: n!/(n-k)!
+    assert n >= 1, "n must be >= 1"
+    assert k >= 1, "k must be >= 1"
+    assert n >= k, f"{n=} cannot be smaller than {k=}"
+
+    return reduce(lambda x, y: x * y, range(n, n - k, -1))
 
 
 def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Schedule:
