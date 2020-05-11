@@ -25,6 +25,10 @@ class Activity:
     def _parse_constraint(c: Constraint) -> Tuple[str, str, str]:
         """ Parse line string constraint into subject, operator, value tuple """
         subject, operator, value = c.split(" ")
+
+        if operator != "==":
+            raise ValueError(f"Not recognized operator '{operator}'")
+
         return (subject, operator, value)
 
     def is_slot_valid(self, slot: RoomSlot) -> bool:
@@ -62,7 +66,7 @@ def total_number_of_combinations(n: int, k: int) -> int:
 
 
 def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Schedule:
-    """ Scheduler which uses Deep First Search aproach """
+    """ Scheduler which uses Depth First Search aproach """
 
     def get_next_unasigned_variable(schedule):
         for activity in activities:
