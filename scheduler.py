@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Callable
 from collections import deque
 from functools import reduce
 
@@ -65,8 +65,12 @@ def total_number_of_combinations(n: int, k: int) -> int:
     return reduce(lambda x, y: x * y, range(n, n - k, -1))
 
 
-def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Schedule:
-    """ Scheduler which uses Depth First Search aproach """
+def search_scheduler(
+    activities: List[Activity],
+    slots: List[RoomSlot],
+    progress_callback: Callable[[deque], None] = None,
+) -> Schedule:
+    """ Scheduler which uses Depth First Search approach """
 
     def get_next_unasigned_variable(schedule):
         for activity in activities:
@@ -82,6 +86,8 @@ def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Sched
     queue.append(dict())
 
     while queue:
+        if progress_callback:
+            progress_callback(queue)
         schedule = queue.popleft()
 
         validation_checks = [
@@ -95,14 +101,18 @@ def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Sched
             return schedule  # We have a winner!
 
         possible_values = get_possible_values(schedule, next_variable)
-        if possible_values:
-            for value in reversed(possible_values):
-                queue.appendleft({**schedule, next_variable: value})
+        queue.extendleft(
+            [{**schedule, next_variable: value} for value in possible_values]
+        )
 
     return {}  # No solution found
 
 
-def find_schedule(activities: List[Activity], slots: List[RoomSlot],) -> Schedule:
+def find_schedule(
+    activities: List[Activity],
+    slots: List[RoomSlot],
+    progress_callback: Callable[[deque], None] = None,
+) -> Schedule:
     """ Finds a schedule that meets all constraints
         Returns map between Activity and RoomSlots, or empty dict if not possible
     """
@@ -110,5 +120,5 @@ def find_schedule(activities: List[Activity], slots: List[RoomSlot],) -> Schedul
         raise SchedulerError("Number of activities exceeds slots")
 
     # schedule = all_combination_scheduler(activities, slots, constraints)
-    schedule = search_scheduler(activities, slots)
+    schedule = search_scheduler(activities, slots, progress_callback)
     return schedule

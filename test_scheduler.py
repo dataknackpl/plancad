@@ -1,4 +1,6 @@
 import pytest  # type: ignore
+from unittest.mock import MagicMock
+
 from scheduler import (
     total_number_of_combinations,
     find_schedule,
@@ -125,3 +127,40 @@ def test_find_schedule_single_constraint():
     for a, s in schedule.items():
         if a.constraints:
             assert a.is_slot_valid(s), "slot must be valid in result schedule"
+
+
+def test_progress_callback_called():
+    """ Search scheduler should call progress_callback if provided """
+
+    activities = [Activity(n) for n in ["A1", "A2", "A3"]]
+    activities.append(Activity("A4", ["room == R2"]))
+
+    slots = [
+        make_slot(t) for t in [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R1", "M12")]
+    ]
+
+    pc = MagicMock()
+    find_schedule(activities, slots, progress_callback=pc)
+    pc.assert_called()
+
+
+def test_progress_callback_as_debug():
+    """ Search scheduler should call progress_callback if provided """
+    activities = [Activity(n) for n in ["A1", "A2", "A3"]]
+    activities.append(Activity("A4", ["room == R2"]))
+
+    slots = [
+        make_slot(t) for t in [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R1", "M12")]
+    ]
+
+    count = 0
+
+    def debug_progress_callback(queue):
+        nonlocal count
+        print(queue)
+        count += 1
+
+    find_schedule(activities, slots, progress_callback=debug_progress_callback)
+    print(f"{count=}")
+
+    assert count > 0
