@@ -80,18 +80,14 @@ def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Sched
 
     queue: deque = deque()
     queue.append(dict())
-    visited = set()
 
     while queue:
         schedule = queue.popleft()
-        if frozenset(schedule.items()) in visited:
-            continue
 
         validation_checks = [
             a.is_slot_valid(s) for a, s in schedule.items() if a.constraints
         ]
         if not all(validation_checks):
-            visited.add(frozenset(schedule.items()))
             continue
 
         next_variable = get_next_unasigned_variable(schedule)
@@ -102,8 +98,6 @@ def search_scheduler(activities: List[Activity], slots: List[RoomSlot]) -> Sched
         if possible_values:
             for value in reversed(possible_values):
                 queue.appendleft({**schedule, next_variable: value})
-
-        visited.add(frozenset(schedule.items()))
 
     return {}  # No solution found
 
