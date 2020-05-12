@@ -1,5 +1,8 @@
 import pytest  # type: ignore
 from unittest.mock import MagicMock
+import time
+
+from tqdm import tqdm
 
 from scheduler import (
     total_number_of_combinations,
@@ -152,15 +155,25 @@ def test_progress_callback_as_debug():
     slots = [
         make_slot(t) for t in [("R1", "M8"), ("R1", "M9"), ("R2", "M8"), ("R1", "M12")]
     ]
+    total_combinations = total_number_of_combinations(len(slots), len(activities))
+    print(f"{total_combinations=}")
+    pbar = tqdm(total=total_combinations, initial=0)
 
-    count = 0
+    prev_remaining = total_combinations
 
     def debug_progress_callback(queue):
-        nonlocal count
-        print(queue)
-        count += 1
+        nonlocal prev_remaining
+        remaining_combinations = sum(
+            [
+                total_number_of_combinations(
+                    len(slots) - len(elem), len(activities) - len(elem)
+                )
+                for elem in queue
+            ]
+        )
+        pbar.update(prev_remaining - remaining_combinations)
+        prev_remaining = remaining_combinations
+        time.sleep(0.5)
 
     find_schedule(activities, slots, progress_callback=debug_progress_callback)
-    print(f"{count=}")
-
-    assert count > 0
+    pbar.close()

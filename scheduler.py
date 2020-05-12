@@ -58,8 +58,13 @@ class SchedulerError(Exception):
 def total_number_of_combinations(n: int, k: int) -> int:
     """ Calculate how many nodes at total needs to be visited """
     # num of combinations: n!/(n-k)!
-    assert n >= 1, "n must be >= 1"
-    assert k >= 1, "k must be >= 1"
+    # assert n >= 1, f"n must be >= 1, was {n}"
+    # assert k >= 1, f"k must be >= 1, was {k}"
+    if n <= 0:
+        return 0
+    if k <= 0:
+        return 0
+
     assert n >= k, f"{n=} cannot be smaller than {k=}"
 
     return reduce(lambda x, y: x * y, range(n, n - k, -1))
@@ -102,7 +107,7 @@ def search_scheduler(
 
         possible_values = get_possible_values(schedule, next_variable)
         queue.extendleft(
-            [{**schedule, next_variable: value} for value in possible_values]
+            reversed([{**schedule, next_variable: value} for value in possible_values])
         )
 
     return {}  # No solution found

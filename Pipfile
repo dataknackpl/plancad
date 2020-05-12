@@ -4,12 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+tqdm = "*"
 
 [dev-packages]
 mypy = "*"
 pytest = "*"
 flake8 = "*"
-black = "*"
+black = "==19.10b0"
 pre-commit = "*"
 
 [requires]
