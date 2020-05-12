@@ -2,7 +2,7 @@ import pytest  # type: ignore
 from unittest.mock import MagicMock
 import time
 
-from tqdm import tqdm
+from tqdm import tqdm  # type: ignore
 
 from scheduler import (
     total_number_of_combinations,
@@ -173,7 +173,7 @@ def test_progress_callback_as_debug():
         )
         pbar.update(prev_remaining - remaining_combinations)
         prev_remaining = remaining_combinations
-        time.sleep(0.5)
+        time.sleep(0.1)
 
     find_schedule(activities, slots, progress_callback=debug_progress_callback)
     pbar.close()

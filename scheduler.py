@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Callable
+from typing import List, Set, Dict, Tuple, Callable, Union
 from collections import deque
 from functools import reduce
 
@@ -70,6 +70,13 @@ def total_number_of_combinations(n: int, k: int) -> int:
     return reduce(lambda x, y: x * y, range(n, n - k, -1))
 
 
+def generate_activity_slots_map(
+    activities: List[Activity], slots: List[RoomSlot],
+) -> Dict[Activity, List[RoomSlot]]:
+    """ Utility function to get map of possible slots for activities """
+    return {a: [s for s in slots if a.is_slot_valid(s)] for a in activities}
+
+
 def search_scheduler(
     activities: List[Activity],
     slots: List[RoomSlot],
@@ -77,15 +84,38 @@ def search_scheduler(
 ) -> Schedule:
     """ Scheduler which uses Depth First Search approach """
 
-    def get_next_unasigned_variable(schedule):
-        for activity in activities:
-            if activity not in schedule:
-                return activity
-        return None
+    activity_slots_map = generate_activity_slots_map(activities, slots)
+
+    def most_constrainted_variable(
+        activities: List[Activity], used_values: Set[RoomSlot]
+    ) -> Union[Activity, None]:
+        if not activities:
+            return None
+
+        # Tuples of (available option count, activity)
+        option_count = [
+            (len(set(activity_slots_map[a]) - used_values), a) for a in activities
+        ]
+        options_count_sorted = sorted(option_count, key=lambda x: x[0])
+        most_restricted_option = options_count_sorted[0]
+        return most_restricted_option[1]  # The activity
+
+    def get_next_unassigned_variable(schedule):
+        unassigned_activities = [a for a in activities if a not in schedule]
+
+        if not unassigned_activities:
+            return None
+
+        # find most constrained variable - mcv
+        # which here is one with least possible values
+        used_values = set(schedule.values())
+
+        mcv = most_constrainted_variable(unassigned_activities, used_values)
+        return mcv
 
     def get_possible_values(schedule, next_variable):
         used_values = set(schedule.values())
-        return [v for v in slots if v not in used_values]
+        return [v for v in activity_slots_map[next_variable] if v not in used_values]
 
     queue: deque = deque()
     queue.append(dict())
@@ -101,7 +131,7 @@ def search_scheduler(
         if not all(validation_checks):
             continue
 
-        next_variable = get_next_unasigned_variable(schedule)
+        next_variable = get_next_unassigned_variable(schedule)
         if not next_variable:
             return schedule  # We have a winner!
 
